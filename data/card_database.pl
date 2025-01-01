@@ -1,9 +1,42 @@
-:-module(card_database,[card/6
+:-module(card_database,[card_field_value/3
+                       ,card/6
                        ]).
 
 /** <module> Magic: the Gathering card database.
 
 */
+
+%!      card_field_value(+CardId,+FieldId,-Value) is det.
+%
+%       Query the Value of a name Field in a Card.
+%
+%       Interface to card/6 terms. Allows the values of card/6 fields to
+%       be retrieved by name. The names of fields, and their indices
+%       in card/6 terms are defined in card_field/2.
+%
+card_field_value(Id,F,V):-
+        must_be(oneof([id,name,cost,mana,wait,legend]),F)
+        ,card_field(F,I)
+        ,T = card(Id,_Name,_Cost,_Mana,_Wait,_Legegnd)
+        ,call(T)
+        ,arg(I,T,V).
+
+
+%!      card_field(?Field,?Index) is semidet.
+%
+%       The Index of a named Field in a card/6 clause.
+%
+%       Used to index into a card/6 term with arg/3 and friends.
+%
+%       @tbd Move to configuration module.
+%
+card_field(id,1).
+card_field(name,2).
+card_field(cost,3).
+card_field(mana,4).
+card_field(wait,5).
+card_field(legend,6).
+
 
 %!      card(?Id,?Name,?Cost,?Mana,?Wait,?Legend) is semidet.
 %
@@ -14,6 +47,7 @@
 %       other database predicates.
 %       * Name: The name printed on the card.
 %       * Cost: The card's mana cost.
+%       * Mana: the amount of mana produced by the card.
 %       * Wait: 'false' if the card can tap the turn it enters play, or
 %       'true' otherwise. e.g. a creature without haste must "wait" so
 %       this field would be "true". If the card doesn't tap then Wait is
@@ -55,4 +89,3 @@ card(stone_brain,'The Stone Brain',2,0,true,true).
 card(weathered_runestone,'Weathered Runestone',2,0,nil,false).
 card(god_pharaohs_statue,'God-Pharaoh\s Statue',6,0,nil,true).
 card(platinum_angel,'Platinum Angel',7,0,false,false).
-
